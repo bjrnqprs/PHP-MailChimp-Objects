@@ -66,49 +66,6 @@ class MailChimpUser {
 	}
 
 	/**
-	 * Initialize this class with a MailChimp user record, or create a new one
-	 *
-	 * @param string $email
-	 * @param string $listId
-	 * @param boolean $new Wether to create a new user based on this info, or try to retrieve an existsing user
-	 * @return MailChimpUser
-	 */
-	public function init_old($email, $listId, $new = false) {
-		unset($this->userData);
-
-		if ($new) {
-			$this->new = true;
-			$this->listId = $listId;
-			$this->userData = array('merges' => array());
-
-			$this->setEmail($email);
-			$this->setEmailType(MailChimp::EMAIL_TYPE_HTML);
-		} else {
-			$user = $this->mc->listMemberInfo($listId, $email);
-
-			if (is_array($user)) {
-				$this->listId = $listId;
-				$this->userData = $user;
-
-				if(isset($this->userData['merges']) == false) {
-					$this->userData['merges'] = array();
-				} else {
-					// Remove any alias-tags, aka MERGE0, MERGE1, etc
-					foreach($this->userData['merges'] as $key => $value) {
-						if(strtoupper(substr($key, 0, 5)) == 'MERGE') {
-							unset($this->userData['merges'][$key]);
-						}
-					}
-				}
-			} else {
-				$this->errors[] = $this->mc->errorCode . ': ' . $this->mc->errorMessage;
-			}
-		}
-
-		return $this;
-	}
-
-	/**
 	 * Returns true when the current record will be new in MailChimp, or false when it
 	 * already exists and only be updated in MailChimp.
 	 *
